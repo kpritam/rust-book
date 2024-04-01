@@ -1,14 +1,18 @@
+use rand::Rng;
 use std::cmp::Ordering;
 use std::io;
-use rand::Rng;
+use std::str::FromStr;
 
-pub fn play() {
+pub fn run() {
     let secret = gen_secret();
     println!("Secret: {secret}");
 
     loop {
         println!("Please enter you guess: ");
-        let guess = read_guess();
+        let guess: i32 = match read_guess() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
 
         match guess.cmp(&secret) {
             Ordering::Greater => println!("Number is too high!"),
@@ -21,14 +25,14 @@ pub fn play() {
     }
 }
 
-fn read_guess() -> i32 {
+fn read_guess<F: FromStr>() -> Result<F, F::Err> {
     let mut guess = String::new();
 
     io::stdin()
         .read_line(&mut guess)
         .expect("Failed to read guess!");
 
-    guess.trim().parse().expect("Please enter number!")
+    guess.trim().parse()
 }
 
 fn gen_secret() -> i32 {
